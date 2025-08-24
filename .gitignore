@@ -1,0 +1,10 @@
+# dependencies
+node_modules/
+
+# env & secrets
+.env
+.env.*
+*.pem
+
+# folders
+public/
