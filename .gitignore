@@ -6,5 +6,11 @@ node_modules/
 .env.*
 *.pem
 
+api/.env
+api/modules/mail.js
+
 # folders
 public/
+
+# files
+UpdateRepo.ps1
