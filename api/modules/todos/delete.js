@@ -21,18 +21,25 @@ function deleteTodo(name, user) {
     const sql = `DELETE FROM todos WHERE name = ? AND from_user = ?`;
     const values = [name, user];
 
-    pool.query(sql, values, function (err, result) {
-        if (err) {
-            console.error("Error deleting todo: ", err);
-            throw err;
-        }
+    return new Promise((resolve, reject) => {
 
-        if (result.affectedRows > 0) {
-            console.log(`ToDo successfully deleted: ${name} by user: ${user}`);
-        } else {
-            console.log("No todo found with the given name and user.");
-        }
+        pool.query(sql, values, function (err, result) {
+            if (err) {
+                console.error("Error deleting todo: ", err);
+                reject(err);
+                return;
+            }
+
+            if (result.affectedRows > 0) {
+                console.log(`ToDo successfully deleted: ${name} by user: ${user}`);
+                resolve(result);
+            } else {
+                console.log("No todo found with the given name and user.");
+                resolve([]);
+            }
+        });
     });
-};
+
+}
 
 module.exports = { deleteTodo };

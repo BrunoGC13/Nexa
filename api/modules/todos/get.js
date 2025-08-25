@@ -19,22 +19,49 @@ const pool = mysql.createPool({
 });
 
 function getTodo(name, user) {
-    const sql = `SELECT name, from_user WHERE name = ? AND from_user = ?`;
+    const sql = `SELECT name, from_user FROM todos WHERE name = ? AND from_user = ?`;
     const values = [name, user];
 
-    pool.query(sql, values, function (err, result) {
-        if (err) {
-            console.error("Error getting todo: ", err);
-            throw err;
-        }
+    return new Promise((resolve, reject) => {
+        pool.query(sql, values, function (err, result) {
+            if (err) {
+                console.error("Error getting todo: ", err);
+                reject(err);
+                return;
+            }
 
-        if (result.affectedRows > 0) {
-            console.log(`Successfully got todo: ${name} by user: ${user}`);
-        } else {
-            console.log("No todo found with the given name and user.");
-        }
+            if (result.length > 0) {
+                console.log(`Successfully got todo: ${name} by user: ${user}`);
+                resolve(result);
+            } else {
+                console.log("No todo found with the given name and user.");
+                resolve([]);
+            }
+        });
     });
-
 }
 
-module.exports = { getTodo };
+function getTodoByUser(user) {
+    const sql = `SELECT name FROM todos WHERE from_user = ?`;
+    const values = [user];
+
+    return new Promise((resolve, reject) => {
+        pool.query(sql, values, function (err, result) {
+            if (err) {
+                console.error("Error getting todo: ", err);
+                reject(err);
+                return;
+            }
+
+            if (result.length > 0) {
+                console.log(`Successfully got todos: ${user}`);
+                resolve(result);
+            } else {
+                console.log("No todo found with the given name and user.");
+                resolve([]);
+            }
+        });
+    });
+}
+
+module.exports = { getTodo, getTodoByUser };

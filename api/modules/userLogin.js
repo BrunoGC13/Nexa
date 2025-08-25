@@ -44,4 +44,4 @@ function login(user, hashedPassword) {
     });
 }
 
-export { login };
+module.export = { login };

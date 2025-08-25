@@ -4,11 +4,12 @@ const cors = require('cors');
 const axios = require('axios');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
+const path = require("path");
 
 // === Modules ===
 const hash = require('./modules/hash');
 const saveUser = require('./modules/saveUser');
-const login = require('./modules/loginUser');
+const login = require('./modules/userLogin');
 
 const createTodo = require('./modules/todos/create');
 const deleteTodo = require('./modules/todos/delete');
@@ -40,7 +41,7 @@ app.post('/api/user/login', async (req, res) => {
 
     res.send(`Erfolgreich! Hashed Password: ${hashedPassword}`);
 
-    login.login(user, hashedPassword)
+    login.login()
 
   } catch (err) {
     console.error("Error hashing password:", err);
@@ -86,11 +87,12 @@ app.post('/api/todos/create', async (req, res) => {
   }
 
   try {
-    await createTodo.createTodo(name, priority, user, currentTime);
-    res.send("ToDo added successfully!");
+    const result = await createTodo.createTodo(name, priority, user, currentTime);
+    console.log("Fetched Todo:", result);
+    res.send(result);
   } catch (err) {
-    console.error("Error creating todo:", err);
-    res.status(500).send("Error creating todo");
+    res.status(500).send("Error fetching todo: " + err.message);
+    console.error("Error fetching todo:", err);
   }
 });
 
@@ -102,9 +104,14 @@ app.delete('/api/todos/delete', async (req, res) => {
     return;
   }
 
-  deleteTodo.deleteTodo(name, user);
-
-  res.send("ToDo deleted successfully!");
+  try {
+    const result = await deleteTodo.deleteTodo(name, user);
+    console.log("Fetched Todo:", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching todo: " + err.message);
+    console.error("Error fetching todo:", err);
+  }
 });
 
 app.put('/api/todos/finish', async (req, res) => {
@@ -115,22 +122,59 @@ app.put('/api/todos/finish', async (req, res) => {
     return;
   }
 
-  finishTodo.finishTodo(name, user);
-
-  res.send("ToDo updated successfully!");
+  try {
+    const result = await finishTodo.finishTodo(name, user);
+    console.log("Fetched Todo:", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching todo: " + err.message);
+    console.error("Error fetching todo:", err);
+  }
 
 });
 
 app.get('/api/todos/get', async (req, res) => {
-  const { name, user } = req.body;
+  const { name, user } = req.query; // Ändere req.body zu req.query
 
   if (!name || !user) {
-    res.status(500).send("User and todo name are required!");
+    res.status(400).send("User and todo name are required!");
     return;
   }
 
-  getTodo.getTodo(name, user)
+  try {
+    const result = await getTodo.getTodo(name, user);
+    console.log("Fetched Todo:", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching todo: " + err.message);
+    console.error("Error fetching todo:", err);
+  }
 });
+
+app.get('/api/todos/getByUser', async (req, res) => {
+  const { user } = req.query; // Ändere req.body zu req.query
+
+  if (!user) {
+    res.status(400).send("User is required!");
+    return;
+  }
+
+  try {
+    const result = await getTodo.getTodoByUser(user);
+    console.log("Fetched Todo:", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching todo: " + err.message);
+    console.error("Error fetching todo:", err);
+  }
+});
+
+
+// === Check Endpoint ===
+app.get("/check", (req, res) => {
+  res.sendFile(path.join(__dirname, "check.html"));
+});
+
 
 // === Start the server ===
 app.listen(port, () => {

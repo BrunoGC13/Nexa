@@ -1,6 +1,7 @@
 {
   "name": "api",
   "version": "1.0.0",
+  "type": "commonjs",
   "description": "A AI-powered online managing tool",
   "main": "proxy.js",
   "scripts": {

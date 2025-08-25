@@ -1,6 +1,8 @@
 const mysql = require('mysql');
 const path = require('path');
 
+const deleteTodo = require('./delete');
+
 require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
 const db_user = process.env.DB_USER;
@@ -35,10 +37,11 @@ function finishTodo(name, user) {
 
             if (result.affectedRows > 0) {
                 console.log(`ToDo successfully updated: ${name} by user: ${user}`);
-                resolve(`ToDo successfully updated: ${name}`);
+                resolve(result);
+                deleteTodo.deleteTodo(name, user)
             } else {
                 console.log("No todo found with the given name and user.");
-                resolve("No todo found with the given name and user.");
+                resolve([]);
             }
         });
     });

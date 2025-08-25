@@ -18,17 +18,23 @@ const pool = mysql.createPool({
 });
 
 function createTodo(name, priority, user, currentTime) {
-    const sql = `INSERT INTO todos (name, created_at, finished, priority, from_user) VALUES (?, ?, ?, ?, ?)`;
-    const values = [name, currentTime, false, priority, user];
+    const sql = `INSERT INTO todos (name, created_at, for_day, finished, priority, from_user) VALUES (?, ?, ?, ?, ?, ?)`;
+    const values = [name, currentTime, currentTime, false, priority, user];
 
-    pool.query(sql, values, function (err, result) {
-        if (err) {
-            console.error("Error creating todo:", err);
-            throw err;
-        }
-        console.log("Successfully created todo:", result.insertId);
+
+    return new Promise((resolve, reject) => {
+
+        pool.query(sql, values, function (err, result) {
+            if (err) {
+                console.error("Error creating todo:", err);
+                reject(err);
+                return;
+            }
+            console.log("Successfully created todo:", result.insertId);
+            resolve(result);
+        });
+
     });
-
 }
 
 module.exports = { createTodo };
