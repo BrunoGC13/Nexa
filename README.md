@@ -26,8 +26,8 @@ For example, if you want to retrieve data about a todo, you can get the details 
 Currently in development - connect to a CalDAV calendar (with auth) to retrieve events and add, delete and edit them. 
 
 It can remind you to finish your todos by sending you a email reminder. 
-it also features a review what you have done and what not, and automatically assigns the todo for the next day.
-If you finish your todos every day you can get a-day-off ticket which you can determine when to redeem.
+
+The reminder will be sent every day at 2pm (14:00). However, you can adjust this by editing `api/modules/automation.js`.
 
 
 ---
