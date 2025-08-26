@@ -39,9 +39,10 @@ app.post('/api/user/login', async (req, res) => {
     const hashedPassword = await hash.hashPassword(password);
     console.log("Hashed Password:", hashedPassword);
 
-    res.send(`Erfolgreich! Hashed Password: ${hashedPassword}`);
-
-    login.login()
+    const result = await login.userLogin(user, password);
+    if (result) {
+      res.send("User login erfolgreich")
+    } else res.send("User login unerfolgreich")
 
   } catch (err) {
     console.error("Error hashing password:", err);
@@ -179,4 +180,6 @@ app.get("/check", (req, res) => {
 // === Start the server ===
 app.listen(port, () => {
   console.log("Server running on http://localhost:3000");
+  console.log("🚀 Hey there! Seems like you successfully started Nexa!")
+  console.log("✅ To check if Nexa is working visit: http://localhost:3000/check")
 });
