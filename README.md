@@ -1,6 +1,6 @@
 # Nexa
 
-This is my project for managing todos and calendar events.
+This is my project for managing todos.
 This project is based on the NodeJS framework. 
 
 ![Node.js](https://img.shields.io/badge/node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)

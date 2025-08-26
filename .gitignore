@@ -16,3 +16,4 @@ api/calendar/ai
 # files
 UpdateRepo.ps1
 old_data.txt
+requests.rest

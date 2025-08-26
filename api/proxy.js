@@ -31,12 +31,13 @@ const secret_key = process.env.SECRET_KEY;
 
 app.post('/api/user/login', async (req, res) => {
   const { user, password } = req.body;
+  const user_jwt = { name: user };
 
   const dbUser = await login.userLogin(user, password);
   if (dbUser) {
+    const token = jwt.sign(user_jwt, secret_key);
+    res.json({ accessToken: token });
 
-    const token = jwt.sign({ userId: dbUser.id, username: dbUser.name }, secret_key, { expiresIn: '1h' });
-    res.json({ token }); 
   } else {
     res.status(401).send("Invalid username or password.");
   }
@@ -70,7 +71,7 @@ app.post('/api/user/create', async (req, res) => {
 
 // === ToDo Endpoints ===
 
-app.post('/api/todos/create', async (req, res) => {
+app.post('/api/todos/create', authenticateToken, async (req, res) => {
   const { name, priority, user } = req.body;
   const currentTime = new Date().toISOString().split('T')[0];
 
@@ -80,7 +81,7 @@ app.post('/api/todos/create', async (req, res) => {
   }
 
   try {
-    const result = await createTodo.createTodo(name, priority, user, currentTime);
+    const result = await createTodo.createTodo(name, priority, req.user.name, currentTime);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {
@@ -89,8 +90,8 @@ app.post('/api/todos/create', async (req, res) => {
   }
 });
 
-app.delete('/api/todos/delete', async (req, res) => {
-  const { name, user } = req.body;
+app.delete('/api/todos/delete', authenticateToken, async (req, res) => {
+  const { name, user } = req.query;
 
   if (!name || !user) {
     res.status(500).send("User and todo name are required!");
@@ -98,7 +99,7 @@ app.delete('/api/todos/delete', async (req, res) => {
   }
 
   try {
-    const result = await deleteTodo.deleteTodo(name, user);
+    const result = await deleteTodo.deleteTodo(name, req.user.name);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {
@@ -107,8 +108,8 @@ app.delete('/api/todos/delete', async (req, res) => {
   }
 });
 
-app.put('/api/todos/finish', async (req, res) => {
-  const { name, user } = req.body;
+app.put('/api/todos/finish', authenticateToken, async (req, res) => {
+  const { name, user } = req.query;
 
   if (!name || !user) {
     res.status(500).send("User and todo name are required!");
@@ -116,7 +117,7 @@ app.put('/api/todos/finish', async (req, res) => {
   }
 
   try {
-    const result = await finishTodo.finishTodo(name, user);
+    const result = await finishTodo.finishTodo(name, req.user.name);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {
@@ -126,8 +127,8 @@ app.put('/api/todos/finish', async (req, res) => {
 
 });
 
-app.get('/api/todos/get', async (req, res) => {
-  const { name, user } = req.query; // Ändere req.body zu req.query
+app.get('/api/todos/get', authenticateToken, async (req, res) => {
+  const { name, user } = req.query;
 
   if (!name || !user) {
     res.status(400).send("User and todo name are required!");
@@ -135,7 +136,7 @@ app.get('/api/todos/get', async (req, res) => {
   }
 
   try {
-    const result = await getTodo.getTodo(name, user);
+    const result = await getTodo.getTodo(name, req.user.name);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {
@@ -144,8 +145,8 @@ app.get('/api/todos/get', async (req, res) => {
   }
 });
 
-app.get('/api/todos/getByUser', async (req, res) => {
-  const { user } = req.query; // Ändere req.body zu req.query
+app.get('/api/todos/getByUser', authenticateToken, async (req, res) => {
+  const { user } = req.query;
 
   if (!user) {
     res.status(400).send("User is required!");
@@ -153,7 +154,7 @@ app.get('/api/todos/getByUser', async (req, res) => {
   }
 
   try {
-    const result = await getTodo.getTodoByUser(user);
+    const result = await getTodo.getTodoByUser(req.user.name);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {
@@ -168,6 +169,20 @@ app.get("/check", (req, res) => {
   res.sendFile(path.join(__dirname, "check.html"));
 });
 
+
+function authenticateToken(req, res, next) {
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  if (token == null) return res.sendStatus(401);
+
+  jwt.verify(token, secret_key, (err, user) => {
+    if (err) return res.sendStatus(403);
+    req.user = user;
+    next();
+  });
+
+};
 
 // === Start the server ===
 app.listen(port, () => {
