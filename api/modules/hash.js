@@ -16,10 +16,21 @@ function hashPassword(password) {
                     return;
                 }
 
-                resolve(hash); 
+                resolve(hash);
             });
         });
     });
 }
 
-module.exports = { hashPassword };
+async function comparePasswords(userPassword, hashedPassword) {
+    try {
+        const result = await bcrypt.compare(userPassword, hashedPassword);
+        console.log(result);
+        return result;
+    } catch (err) {
+        console.error("Error when comparing passwords:", err);
+        throw err;
+    }
+};
+
+module.exports = { hashPassword, comparePasswords };

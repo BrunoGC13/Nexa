@@ -5,6 +5,7 @@ const axios = require('axios');
 const mysql = require('mysql');
 const bodyParser = require('body-parser');
 const path = require("path");
+const jwt = require('jsonwebtoken');
 
 // === Modules ===
 const hash = require('./modules/hash');
@@ -16,37 +17,28 @@ const deleteTodo = require('./modules/todos/delete');
 const finishTodo = require('./modules/todos/finish');
 const getTodo = require('./modules/todos/get');
 
+const reminder = require('./modules/automation');
+reminder.run();
+
 const port = 3000;
 const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
+const secret_key = process.env.SECRET_KEY;
+
 // === User Endpoints ===
 
 app.post('/api/user/login', async (req, res) => {
-  const user = req.headers["user"];
-  const password = req.headers["password"];
+  const { user, password } = req.body;
 
-  if (!user || !password) {
-    res.status(500).send("User and Password headers are required!");
-    return;
-  }
+  const dbUser = await login.userLogin(user, password);
+  if (dbUser) {
 
-  console.log("Benutzer: " + user);
-  console.log("Passwort: " + password);
-
-  try {
-    const hashedPassword = await hash.hashPassword(password);
-    console.log("Hashed Password:", hashedPassword);
-
-    const result = await login.userLogin(user, password);
-    if (result) {
-      res.send("User login erfolgreich")
-    } else res.send("User login unerfolgreich")
-
-  } catch (err) {
-    console.error("Error hashing password:", err);
-    res.status(500).send("Error hashing password");
+    const token = jwt.sign({ userId: dbUser.id, username: dbUser.name }, secret_key, { expiresIn: '1h' });
+    res.json({ token }); 
+  } else {
+    res.status(401).send("Invalid username or password.");
   }
 });
 
