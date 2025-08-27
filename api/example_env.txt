@@ -1,0 +1,14 @@
+DB_NAME=nexa
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=nexa
+DB_PASSWD=superSecretPassword
+
+MAIL_SENDER=someone@example.com
+MAIL_PASSWORD=superSecretPassword
+MAIL_SERVER=smtp.example.com
+MAIL_PORT=465
+MAIL_SSL=true
+MAIL_SSL_TYPE=ssl
+
+SECRET_KEY=keepItASecret

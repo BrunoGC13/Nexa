@@ -13,6 +13,32 @@ basic functionality of my project.
 
 ---
 
+## **Important**
+
+Before you start using Nexa, you have to set up your .env in api/ . It should contain data for a MySQL database, Mail server and a secret key for JWT, which you can generate in the node console by running:
+
+```bash
+node
+```
+
+```javascript
+require('crypto').randomBytes(64).toString('hex')
+```
+
+An example .env file is located in api/example_env.txt.
+I also will be starting to code on different databases, maybe I'll make a JSON database if you don't have or want to use MySQL.
+
+PS: The mailserver is optional, you can disable this function by going into the api/proxy.js and deleting those two lines near the top:
+
+```javascript
+const reminder = require('./modules/automation');
+reminder.run();
+```
+
+Now you can go on!
+
+---
+
 ## Content
 
 1. [How to setup](#how-to-setup)
