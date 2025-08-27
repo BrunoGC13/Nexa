@@ -43,6 +43,9 @@ Now you can go on!
 
 1. [How to setup](#how-to-setup)
 
+
+[Credits](#credits)
+
 ## What can it do?
 
 The backend itself can retrieve user data to log users in and create users. 
@@ -111,3 +114,7 @@ There are 2 endpoints for the users:
 
 - /api/user/create - creates a user by sending a POST request with the users name, password and email as a body.
 - /api/user/login - send a POST request with the users name and password to look if the user can login.
+
+## Credits
+
+For my frontend (the public page) I've used a design made by [Alayna Johnston](https://uiverse.io/profile/ayyjayy2) from [uiverse.io](https://uiverse.io/). The design I used can you find [here](https://uiverse.io/ayyjayy2/sour-dog-94).
