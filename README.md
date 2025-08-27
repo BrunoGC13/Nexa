@@ -118,3 +118,4 @@ There are 2 endpoints for the users:
 ## Credits
 
 For my frontend (the public page) I've used a design made by [Alayna Johnston](https://uiverse.io/profile/ayyjayy2) from [uiverse.io](https://uiverse.io/). The design I used can you find [here](https://uiverse.io/ayyjayy2/sour-dog-94).
+Just that you know, the frontend is currently unavailable!
