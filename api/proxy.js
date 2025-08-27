@@ -17,6 +17,10 @@ const deleteTodo = require('./modules/todos/delete');
 const finishTodo = require('./modules/todos/finish');
 const getTodo = require('./modules/todos/get');
 
+const createTag = require('./modules/tags/create');
+const deleteTag = require('./modules/tags/delete');
+const getTags = require('./modules/tags/get');
+
 const reminder = require('./modules/automation');
 reminder.run();
 
@@ -69,19 +73,75 @@ app.post('/api/user/create', async (req, res) => {
   }
 });
 
-// === ToDo Endpoints ===
+// === Tag Endpoints ===
 
-app.post('/api/todos/create', authenticateToken, async (req, res) => {
-  const { name, priority, user } = req.body;
-  const currentTime = new Date().toISOString().split('T')[0];
+app.post('/api/tags/create', authenticateToken, async (req, res) => {
+  const { name, user } = req.body;
 
-  if (!name || !priority || !user) {
-    res.status(500).send("User, priority, and name are required!");
+  if (!name || !user) {
+    res.status(500).send("User, and name are required!");
     return;
   }
 
   try {
-    const result = await createTodo.createTodo(name, priority, req.user.name, currentTime);
+    const result = await createTag.createTag(name, req.user.name);
+    console.log("Fetched tag: ", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching tag: " + err.message);
+    console.error("Error fetching tag: ", err);
+  }
+});
+
+app.delete('/api/tags/delete', authenticateToken, async (req, res) => {
+  const { name, user } = req.query;
+
+  if (!name || !user) {
+    res.status(500).send("User and tag name are required!");
+    return;
+  }
+
+  try {
+    const result = await deleteTag.deleteTag(name, req.user.name);
+    console.log("Fetched tag: ", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching tag: " + err.message);
+    console.error("Error fetching tag: ", err);
+  }
+});
+
+app.get('/api/tags/getByUser', authenticateToken, async (req, res) => {
+  const { user } = req.query;
+
+  if (!user) {
+    res.status(400).send("User is required!");
+    return;
+  }
+
+  try {
+    const result = await getTags.getTagsByUser(req.user.name);
+    console.log("Fetched tag: ", result);
+    res.send(result);
+  } catch (err) {
+    res.status(500).send("Error fetching tag: " + err.message);
+    console.error("Error fetching tag: ", err);
+  }
+});
+
+// === ToDo Endpoints ===
+
+app.post('/api/todos/create', authenticateToken, async (req, res) => {
+  const { name, priority, user, tags } = req.body;
+  const currentTime = new Date().toISOString().split('T')[0];
+
+  if (!name || !priority || !user || !tags) {
+    res.status(500).send("User, priority, tags and name are required!");
+    return;
+  }
+
+  try {
+    const result = await createTodo.createTodo(name, priority, req.user.name, currentTime, tags);
     console.log("Fetched Todo:", result);
     res.send(result);
   } catch (err) {

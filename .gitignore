@@ -11,8 +11,13 @@ api/modules/mail.js
 
 # folders
 public/
+public_private/
 api/modules/calendar
 api/calendar/ai
+api/modules/ai
+api/modules/utils
+
+
 # files
 UpdateRepo.ps1
 old_data.txt
